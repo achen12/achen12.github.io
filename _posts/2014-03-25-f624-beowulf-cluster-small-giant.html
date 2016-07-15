@@ -1,0 +1,67 @@
+---
+layout: post
+title: 'F624: Beowulf Cluster - Small Giant'
+date: 2014-03-25 19:27:50.000000000 -04:00
+type: post
+published: true
+status: publish
+categories:
+- Fun
+tags: []
+meta:
+  _edit_last: '1'
+  post_views_count: '16'
+  _wpas_done_all: '1'
+author:
+  login: alexc89
+  email: alexc89@mit.edu
+  display_name: alexc89
+  first_name: ''
+  last_name: ''
+---
+<p>Time: March 2014<br />
+Objective (s):  Build a small Beowulf Cluster.</p>
+<p>Background: As a technology research institute, MIT sure does recycle a lot of its computers.  To be fair, these computers often are used more than a decade, and the institute as a whole donates, resell, and lastly reuse these computers.  Thus, when I saw a couple of computers of similar models are being junked, I took the chance and decided on building a small cluster.</p>
+<p>Research:  So how does one construct a cluster?  Professionally, the clusters are often constructed with computers with the architecture designed for distributed computation.  Typically, supercomputer that you hear on the news are computers clusters.  Instead of having a single board/computer handling all of the tasks, computer cluster distribute the tasks into smaller chunks to each computers, allowing petaFlops/second computation.  To put that to scale, a modern Haswell Intel i7 core is around 76 gigaFlops/second.  As of November 2013 The fastest computer in the world is Tianhe-2 by China's National University of Defense Technology,  boasting an awing 33.86 petaFlops/second, roughly 450,000 of the i7 core.<br />
+In our case, the computers are commercial off-the shelf (COTS) computers.  So instead of a setup of a high efficient professional cluster, we will be building a beowulf cluster.  Originally designed by researcher Becker and Sterling in NASA, the beowulf cluster features a master node that delegate all of the tasks.  It will talk to slave nodes via Message Processing Interfaces (MPI) in a private network.  This allows the user to access the master node and be able to use the cluster as if it was a single computer.  With modern day technologies,  a beowulf cluster can be constructed not just with a typical desktop computers.  It can be constructed through small single board computer like Rasberry Pi, or even virtualized machines.  Ex:<br />
+Rasberry Pi cluster : http://www.southampton.ac.uk/~sjc/raspberrypi/<br />
+Ubuntu Virtual cluster : https://www.digitalocean.com/community/articles/how-to-create-a-beowulf-cluster-using-ubuntu-12-04-vps-instances</p>
+<p>Method:<br />
+I used the tutorials as reference:<br />
+- http://www.tldp.org/HOWTO/html_single/Beowulf-HOWTO/<br />
+- http://www.linux.com/community/blogs/133-general-linux/9401<br />
+- http://fscked.org/writings/clusters/cluster.html#toc1</p>
+<p>Hardware:<br />
+Though there isn't any document as to why the computers has to have similar builds, I assume that this is more for efficiency sake for the master node is unaware of the slave's build and power and also for aesthetics.  A typical "reuse" computer are often raided.  Instead of an operational computer, these computers are often missing hard drive and ram.  Thankfully, the dorm hall I'm on have some SATA hard drives to spare.  And using just $30, I was able to find some compatible DDR2  rams on Amazon.com.</p>
+<p>[caption id="attachment_49" align="aligncenter" width="614"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/03/2014-03-21-18.53.22.jpg"><img class=" wp-image-49 " title="Hardware Configurations" alt="Hardware Configurations" src="{{ site.baseurl }}/assets/2014-03-21-18.53.22-1024x768.jpg" width="614" height="461" /></a> Hardware Configurations[/caption]</p>
+<p>There were some Dell Precision computers (top, thicker computer with a front cover for USB), but later replaced them with some Dell Optiplex GXs (thinner with a circular Dell logo on a grate, one currently opened) that I found.  After the computers are setup, the last part is just a network switch, and network card, keyboard, and monitor for the master node.</p>
+<p>Software:  According to the tutorials there are three main items that I need to setup, SSH, NFS, and MPI.  SSH is mainly to open channel for administrator to access each node, and also opening a port for MPI to talk through.  NFS is for the computers to share the same codes/binaries.  So that when executing programs in parallel, I would have less trouble duplicating the code to each node.  Lastly the MPI, it allows the master node to command the slave nodes, and for the slave nodes to return the results.  To ease installation, I'll be using ubuntu 12.04LTS Server Edition.</p>
+<p>Before you even start installing any packages,  make sure that for all of your nodes, you have install the same OS and a user of the same name.  I'll be using my initial - ac.  This will be the user that will maintain the cluster.  Secondly, you'll have to create another common user and a common group.  you can call the group and user any name you want, but make sure they have the same name and ID across all nodes.  For some protection, this user will not have sudo privilege.  For the purpose of this journal, we will call this user, wolf.<br />
+For more information on User management: https://help.ubuntu.com/10.04/serverguide/user-management.html</p>
+<p>For now, you'll have have to plug and unplug the Ethernet cable to the internet onto each node.  You'll setup the network configuration at  the very end.</p>
+<p>Firstly SSH.  Though most server edition linux distros have the ability to ssh into other computers. We will have to open up a port for other computer ssh to us.  Thus we're going to us OpenSSH's server:<br />
+sudo apt-get install openssh-server<br />
+<strong>You can do this after you have setup the network configuration at the end. </strong> To allow password less login,  we will have to generate a RSA key on the master node for the cluster user - wolf, and set the slave nodes to trust the master node.  First generate a RSA key by ssh-keygen.  There are multiple options to change the characteristic of the key.  You can check them out with man ssh-keygen.  After the key generation, you'll have to access the slave nodes at least once, for them to recognize the connection.  After that you'll have to copy your RSA public key to the <strong>~/.ssh/authorized_keys  </strong>in the slave nodes.  Finally test your passwordless connection by exiting and reentering the nodes.<br />
+For more information on OpenSSH: https://help.ubuntu.com/community/SSH/OpenSSH/Configuring</p>
+<p>For NFS, this allows the nodes to sync a sub directory you have.  In my case, I created a new directory /etc/wolf, and used that as my NFS, but likewise you can also use the home directory of wolf.  First install the nfs-kernel-server for master, and nfs-common for slaves.  Make sure for your file privileges are set so that wolf and the group can read, write, and execute. (use chmod)<br />
+For more information on NFS: https://help.ubuntu.com/community/SettingUpNFSHowTo</p>
+<p>Lastly MPI, MPI's configure is fairly straight forward.  We just have to install the package and that's about it.  In this build, I used mpich2, a fairly common and popular implementation of MPI.  To test your build, download the mpich2 source and build it.  There are some example/demo code you can run.  The main thing when executing cluster program via mpiexec, is that you'll need a hostfile, where mine looks like this:<br />
+wolf00 #master<br />
+wolf01 #slave1<br />
+wolf02 #slave2<br />
+wolf03 #slave 3<br />
+This describes the host names of the nodes you'll use to execute,  this include the master node itself if you want it to join in the processing.  You can replace the hostname with the direct static IPs, but it would be easier for you to access nodes via hostnames.</p>
+<p>[caption id="attachment_53" align="aligncenter" width="461"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/03/2014-03-23-17.52.52.jpg"><img class=" wp-image-53 " alt="Looking Better!" src="{{ site.baseurl }}/assets/2014-03-23-17.52.52-768x1024.jpg" width="461" height="614" /></a> Looking Better![/caption]</p>
+<p>Talking about hostnames, the final thing we will have to do is network configuration.  It's time to hook up the cluster.  To setup the cluster, you'll have all the nodes connect to a switch box.  I bought a $20 Gigabit 5 port switch box at MicroCenter, but you can get one even cheaper on ebay or amazon.  First you'll have to define the static IPs for each node.  For me, I started with 192.168.0.100 (in the private IP range - 192.168.0.###)   and increment 1 for each of my node.  To declare there static IP,  we will have to edit the interface configuration file @ /etc/networks/interface.The declaration will be something like this, assuming eth0 is the Ethernet configuration you want to edit:<br />
+ip eth0 inet static<br />
+address:192.168.0.100<br />
+netmask: 255.255.255.0<br />
+gateway: 10.0.0.1<br />
+This change will load the next time you start your computer.  Note: if your ethernet was set originally for dynamic IP when you were installing packages, you'll have to remove that segment of setup. For the sake of sanity, instead of remembering each node with their IP, we'll remember them with their hostnames.  For my setup, I have wolf n, where n is the number of my nodes.  So wolf00 will be master node, and wolf01, wolf02, and wolf03 is for my slave nodes.  You can edit these definitions at /etc/hosts.  For mine:<br />
+wolf00 192.169.0.100<br />
+wolf01 192.168.0.101<br />
+wolf02 192.168.0.102<br />
+wolf03 192.168.0.103</p>
+<p>Awesome now that network configurations are done reboot everything so that the changes can take place!  Log in to your master node and run it!  Here I ran an demo program in the mpich2 source.</p>
+<p>[caption id="attachment_52" align="aligncenter" width="614"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/03/2014-03-23-17.53.19.jpg"><img class=" wp-image-52 " alt="Yay, it calculate Pi!" src="{{ site.baseurl }}/assets/2014-03-23-17.53.19-1024x768.jpg" width="614" height="461" /></a> Yay, it calculate Pi![/caption]</p>
+<p>Some things you can do with a cluster is crypto currency mining,  protein folding, and other cool stuff!  I'll update this when I get a cool program up and running on SmallGiant!</p>

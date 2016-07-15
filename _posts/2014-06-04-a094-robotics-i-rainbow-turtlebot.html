@@ -1,0 +1,39 @@
+---
+layout: post
+title: 'A094- Robotics I: Rainbow Turtlebot'
+date: 2014-06-04 04:36:11.000000000 -04:00
+type: post
+published: true
+status: publish
+categories:
+- Academic
+tags: []
+meta:
+  _edit_last: '1'
+  post_views_count: '15'
+  _wpas_done_all: '1'
+author:
+  login: alexc89
+  email: alexc89@mit.edu
+  display_name: alexc89
+  first_name: ''
+  last_name: ''
+---
+<p>Background: 6.141 or Robotics I is a very popular class in MIT.  One of its coolest aspect is the Grand Challenge.  Teams of five will be tasks to design and build an autonomous robot to tackle the challenge.</p>
+<p>This years challenge involves stacking small 2 inches x 2in x 2in  cubes into structures.  Within a 10 minute time frame, the robot has to navigate around a maze and collect these cubes,  then construct a structure by the end of the round.</p>
+<p>The team consists of Ami Greene, Clark Della Silva, Eric Van Albert, William Kalb, and me.<br />
+For the first half of the semester, we built a standard RSS bot, which has one arm, one camera, and two wheels.  To increase the reliability of the robot, we run the robot very slowly.  Thus we nickedname the robot Turtlebot, in honor of its slow running "brother" (They're both coded in Java) in AP Computer Science I.  The robot is constructed in a lab-oriented fashion, so each week we added new features to the robot.</p>
+<p>[caption id="attachment_122" align="aligncenter" width="300"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/picture000.jpg"><img class="size-medium wp-image-122" src="{{ site.baseurl }}/assets/picture000-300x168.jpg" alt="Turtlebot" width="300" height="168" /></a> Turtlebot[/caption]</p>
+<p>[caption id="attachment_124" align="aligncenter" width="236"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/Team3_Lab6_MapWaypoint.png"><img class="size-medium wp-image-124" src="{{ site.baseurl }}/assets/Team3_Lab6_MapWaypoint-236x300.png" alt="Robot navigating around a given map using configuration space." width="236" height="300" /></a> Robot navigating around a given map using configuration space.[/caption]</p>
+<p>[caption id="attachment_123" align="aligncenter" width="300"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/Team3_Lab3_WithBallRGB.png"><img class="size-medium wp-image-123" src="{{ site.baseurl }}/assets/Team3_Lab3_WithBallRGB-300x230.png" alt="Red Ball detection by pixel filters and blob &amp; edge detection." width="300" height="230" /></a> Red Ball detection by pixel filters and blob &amp; edge detection.[/caption]</p>
+<p>&nbsp;</p>
+<p>At the final four weeks of the semester, the Grand Challenge begins.  We are one of the few teams that decided to completely redesign and build our robot from scratch.  We decided to do so, to increase the robustness of the mechanical and low level computing (control feedback, sensor refresh rate, dead-reckoning accuracy) designs.  In response to the tight schedule, we decided to fashion our robot with a map-blind state machine, in which the robot will ignore the given map and navigate solely with the camera, the sonars, and few of the bump sensors.  Because we're using some scrap material that we can find, the robot became.... quite colorful.  Thus, we evolved its name to Rainbow Turtlebot!</p>
+<p>[caption id="attachment_126" align="aligncenter" width="300"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/2014-05-07-14.15.48.jpg"><img class="size-medium wp-image-126" src="{{ site.baseurl }}/assets/2014-05-07-14.15.48-300x262.jpg" alt="Rainbow Turtlebot" width="300" height="262" /></a> Rainbow Turtlebot[/caption]</p>
+<p>[caption id="attachment_127" align="aligncenter" width="300"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/2014-05-07-16.11.04.jpg"><img class="size-medium wp-image-127" src="{{ site.baseurl }}/assets/2014-05-07-16.11.04-300x225.jpg" alt="Showing the 2 laptops, back hopper, and front conveyor." width="300" height="225" /></a> Showing the 2 laptops, back hopper, and front conveyor.[/caption]</p>
+<p>[caption id="attachment_128" align="aligncenter" width="300"]<a href="http://alexc89.scripts.mit.edu/blog/wp-content/uploads/2014/06/2014-05-07-16.11.12.jpg"><img class="size-medium wp-image-128" src="{{ site.baseurl }}/assets/2014-05-07-16.11.12-300x225.jpg" alt="Showing the Kinect, the conveyor entrance, and the bump sensors." width="300" height="225" /></a> Showing the Kinect, the conveyor entrance, and the bump sensors.[/caption]</p>
+<p>&nbsp;</p>
+<p>Because it was the last four weeks of the semester, everyone is busy.  Thus we make sure that everything is modular.  In hardware, we divided up the structural, front conveyor, back conveyor and hopper, sensory.  As you can see, the both the bump and sonar are made with small laser cut parts; in contrast, the main structural is made from Aluminum extrusions.  In software, we used ROS to divide up the code into modules: Robotbrain (the statemachine), KinectNode, and HAL(Hardware Abstraction Layers).   Thus the Macintosh stored underneath can process the graphical data given by the Kinect Camera quickly and pass it onto the netbook.  The netbook on top contain the state machine and input the command to the micro controllers via the HAL.</p>
+<p>The result was that we're the top if not top three robot in the competition.  We were able to collect ~13 cubes and finish off with the only standing structure with 7 cubes(2 three cube layers and a cube on top).</p>
+<div style="text-align: center;">
+<p><iframe src="//www.youtube.com/embed/8h85KQ9W8Ns" width="480" height="270" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
+</div>
